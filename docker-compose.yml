@@ -1,0 +1,51 @@
+services:
+  db:
+    container_name: postgresql_dial_transcription
+    image: bitnami/postgresql:latest
+    restart: always
+    volumes:
+    - postgres:/data/postgres
+    ports:
+      - 4998:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+  db_test:
+    container_name: postgresql_test_transcription_test
+    image: postgres
+    # restart: always
+    #restart: on-failure
+    volumes:
+    - postgres:/data/postgres
+    ports:
+      - 5413:5432
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME_test}    
+  pgadmin:
+    container_name: pgadmin_dialect
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASSWORD}
+   
+    ports:
+      - 5052:80
+    depends_on:
+      - db
+      - db_test
+  app:
+    container_name: app_transcription_dia
+    build: .
+    volumes:
+      - .:/app
+    ports:
+      - 8110:8110
+    depends_on:
+      - db
+      - db_test
+    restart: always
+volumes:
+  postgres :     
